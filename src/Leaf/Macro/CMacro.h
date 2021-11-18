@@ -54,7 +54,7 @@
 #define LEAF_DEFAULT_REPL_BACKLOG_TIME_LIMIT (60*60)  /* 1 hour */
 #define LEAF_REPL_BACKLOG_MIN_SIZE (1024*16)          /* 16k */
 #define LEAF_BGSAVE_RETRY_DELAY 5 /* Wait a few secs before trying again. */
-#define LEAF_DEFAULT_PID_FILE "/var/run/redis.pid"
+#define LEAF_DEFAULT_PID_FILE "./svr.pid"
 #define LEAF_DEFAULT_SYSLOG_IDENT "redis"
 #define LEAF_DEFAULT_CLUSTER_CONFIG_FILE "nodes.conf"
 #define LEAF_DEFAULT_DAEMONIZE 0

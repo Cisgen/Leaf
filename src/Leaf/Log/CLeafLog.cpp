@@ -34,12 +34,18 @@ void LOG_SVR_RAW(int level, const char *func, int line, const char *msg)
 	FILE *fp;
 	char buf[64];
 	int rawmode = (level & LOG_LOG_RAW);
-	int log_to_stdout = g_ServerFrame.GetServerData()->logfile[0] == '\0';
-
 	level &= 0xff; /* clear flags */
 	if (level < g_ServerFrame.GetServerData()->verbosity) return;
 
-	fp = log_to_stdout ? stdout : fopen(g_ServerFrame.GetServerData()->logfile, "a");
+	if (g_ServerFrame.GetServerData()->logfile != NULL)
+	{
+		fp = fopen(g_ServerFrame.GetServerData()->logfile, "a");
+	}
+	else
+	{
+		fp = stdout;
+	}
+
 	if (!fp) return;
 
 	if (rawmode) 
@@ -57,6 +63,6 @@ void LOG_SVR_RAW(int level, const char *func, int line, const char *msg)
 	}
 	fflush(fp);
 
-	if (!log_to_stdout) fclose(fp);
+	if (!g_ServerFrame.GetServerData()->logfile) fclose(fp);
 	//if (g_ServerFrame.GetServerData()->syslog_enabled) syslog(syslogLevelMap[level], "%s", msg);
 }

@@ -8,9 +8,12 @@
 #include "CNetwork.h"
 #include "CLeafLog.h"
 
+extern CServerFrame g_ServerFrame;
+void SigHandle(int);
 CServerFrame::CServerFrame()
 {
 	m_ServerData.EpollData = NULL;
+	m_ServerData.Shutdown = 0;
 }
 
 CServerFrame::~CServerFrame()
@@ -76,15 +79,14 @@ void CServerFrame::Daemonize()
     if (fork() != 0) exit(0); /* parent exits */
     setsid(); /* create a new session */
 
-	/*signal(SIGINT,  SIG_IGN);
+	signal(SIGINT,  SIG_IGN);
 	signal(SIGHUP,  SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
+	//signal(SIGQUIT, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTTOU, SIG_IGN);
 	signal(SIGTTIN, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN);
 	signal(SIGTERM, SIG_IGN);
-	signal(SIGHUP,  SIG_IGN);*/
 
     /* Every output goes to /dev/null. If it is daemonized but
      * the 'logfile' is set to 'stdout' in the configuration file
@@ -101,11 +103,88 @@ void CServerFrame::Daemonize()
 	umask(0);*/
 }
 
+
+void CServerFrame::CreatePidFile()
+{
+	FILE *fp = fopen(m_ServerData.pidfile, "w");
+	if (fp) 
+	{
+		fprintf(fp, "%d\n",(int)getpid());
+		fclose(fp);
+	}
+}
+
+int CServerFrame::KillProcess()
+{
+	LOG_MSG(LOG_DEBUG, "kill Process!!!");
+	int iPid = -1;
+	FILE *fp = fopen(m_ServerData.pidfile, "r");
+	if (fp) 
+	{
+		fscanf(fp, "%d", &iPid);
+		fclose(fp);
+		if (iPid > 0)
+		{
+			if(kill(iPid, SIGTERM) > 0)
+			{
+				if(ESRCH == errno)
+				{
+					return 0;
+				}
+				else
+				{
+					LOG_MSG(LOG_DEBUG, "KillProcess Sucess!! PID[%d] [%s]", iPid, strerror(errno));
+					return -1;	
+				}
+			}
+			else
+			{
+				LOG_MSG(LOG_DEBUG, "KillProcess Sucess!! PID[%d]", iPid);
+			}
+		}
+		
+	}
+
+	return 0;
+}
+
+void SigHandle(int iSigID)
+{
+	LOG_MSG(LOG_DEBUG, "received signal %d\n", iSigID);
+
+	if(iSigID == SIGTERM)
+	{
+		//停止进程
+		g_ServerFrame.GetServerData()->Shutdown = 1;
+	}	
+	else if(iSigID == SIGUSR2)
+	{   
+		//重载进程配置
+		return;
+	}   
+}
+
 int CServerFrame::InitServerData()
 {
 	// 设置信号处理函数
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
+
+	//注册一下个人信号
+	if(signal(SIGUSR1, SigHandle) == SIG_ERR)
+	{
+		printf("can not catch SIGUSR1\n");
+	}
+
+	if(signal(SIGUSR2, SigHandle) == SIG_ERR)
+	{   
+		printf("can not catch SIGUSR2\n");
+	}   
+
+	if (signal(SIGTERM, SigHandle) == SIG_ERR)
+	{
+		printf("can not catch SIGTERM\n");
+	}
 
 	//申请事件的结构
 	CServerNet* pServerNet = (CServerNet*)malloc(sizeof(CServerNet));
@@ -170,19 +249,25 @@ void CServerFrame::MainLoop()
 	if(pEpollData)
 	{
 		//处理事件
-		CServerEpollData* pData = pEpollData->GetServerData();
-		if (pData)
+		m_ServerData.Shutdown = 0;
+		while (!m_ServerData.Shutdown)
 		{
-			pData->Stop = 0;
-			while (!pData->Stop)
-			{
-				// 如果有需要在事件处理前执行的函数，那么运行它
-				pEpollData->FunBeforeSleepProc();
+			// 如果有需要在事件处理前执行的函数，那么运行它
+			pEpollData->FunBeforeSleepProc();
 
-				// 开始处理事件	
-				pEpollData->ProcessEvents(ALL_EVENTS);
-			}
+			// 开始处理事件	
+			pEpollData->ProcessEvents(ALL_EVENTS);
 		}
+
+		// 服务器进程收到 SIGTERM 信号，关闭服务器
+		// 尝试关闭服务器
+		// 关闭监听套接字，这样在重启的时候会快一点
+		for (int j = 0; j < m_ServerData.ipfd_count; j++)
+		{
+			close(m_ServerData.ipfd[j]);
+		}
+
+		exit(0);
 	}
 }
 

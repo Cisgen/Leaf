@@ -202,7 +202,7 @@ void http_callback(char* ptr, size_t size, size_t nmemb, FundTestClass* userdata
 		}
 	}
 
-	send(userdata->iFd, data.szKeyBuff, sizeof(data.szKeyBuff), 0);
+	//send(userdata->iFd, data.szKeyBuff, sizeof(data.szKeyBuff), 0);
 
 
 	//FILE* fp=NULL; 

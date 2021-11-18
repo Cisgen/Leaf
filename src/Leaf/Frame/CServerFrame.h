@@ -17,6 +17,12 @@ public:
 	// 将服务器设置为守护进程
 	void Daemonize();
 
+	//创建PID文件
+	void CreatePidFile();
+
+	//停止之前的进程
+	int KillProcess();
+
 	//创建并初始化服务器数据结构
 	int InitServerData();
 

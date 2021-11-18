@@ -11,9 +11,6 @@ typedef long off_t;
 class CServerNet;
 struct CServerData 
 {
-
-    /* General */
-
     // 配置文件的绝对路径
     char* Configfile;           /* Absolute config file path, or NULL */
 
@@ -24,7 +21,7 @@ struct CServerData
     CServerNet* EpollData;
 
     // 关闭服务器的标识
-    int shutdown_asap;          /* SHUTDOWN needed ASAP */
+    int Shutdown;          /* SHUTDOWN needed ASAP */
 
     // 在执行 serverCron() 时进行渐进式 rehash
     int activerehashing;        /* Incremental rehash in serverCron() */

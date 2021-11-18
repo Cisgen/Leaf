@@ -183,7 +183,7 @@ void CServerNet::ProcReadEvent(int iEventFd)
 			//发送一个回包
 			char sendbuff[LEAF_IOBUF_LEN] = "++OK\n";
 			int iSendSize = send(iEventFd, sendbuff, sizeof(sendbuff), 0);
-			FundTest(iEventFd);
+			//FundTest(iEventFd);
 		} 
 		else 
 		{
@@ -325,6 +325,7 @@ int CServerNet::ListenAddr(int iSocket, struct sockaddr *sa, socklen_t len, int 
 	if (bind(iSocket, sa, len) < 0) 
 	{
 		close(iSocket);
+		LOG_MSG(LOG_WARNING, "Bind Failed! %s", strerror(errno));
 		return SVR_NET_BIND_PORT_ERR;;
 	}
 
