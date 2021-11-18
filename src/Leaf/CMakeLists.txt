@@ -7,7 +7,7 @@ include(${CMAKE_SOURCE_DIR}/CMakeComm.txt)
 set(EXECUTABLE_OUTPUT_PATH "${home_dir}/runenv/Leaf/bin")
 
 #获取源文件
-add_src_subdirs(source_files  "./Frame" "./Macro" "./Network" "./Log" "./Logic")
+add_src_subdirs(source_files  "./Frame" "./Macro" "./Network" "./Log" "./Logic" "./BackThread")
 
 #添加配置文件描述
 #set(source_files "${res_dir}/src/zone_svr_conf_desc.c" ${source_files})

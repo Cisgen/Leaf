@@ -7,6 +7,7 @@
 #include "CServerError.h"
 #include "CNetwork.h"
 #include "CLeafLog.h"
+#include "CBackThread.h"
 
 extern CServerFrame g_ServerFrame;
 void SigHandle(int);
@@ -217,6 +218,9 @@ int CServerFrame::InitServerData()
 			return SVR_NET_PORT_ERR;
 		}
 	}
+
+	// 初始化后台线程系统
+	CreatePthreadInit();
 
 	return 0;
 }
