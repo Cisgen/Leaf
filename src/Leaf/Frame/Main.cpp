@@ -2,6 +2,37 @@
 //
 
 #include "CServerFrame.h"
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "CLeafLog.h"
+
+#define BT_BUF_SIZE 100
+int nptrs;
+void *buffer[BT_BUF_SIZE];
+
+extern "C"
+{
+	void* __real_malloc(size_t size);
+	void* __wrap_malloc(size_t size)
+	{
+
+		char **strings;
+		int nptrs = backtrace(buffer, BT_BUF_SIZE);
+		strings = backtrace_symbols(buffer, nptrs);
+		if (strings) 
+		{
+			for (int j = 0; j < nptrs; j++)
+				LOG_MSG(LOG_DEBUG, "__wrap_malloc %s", strings[j]);
+		}
+		free(strings);
+		void* p = __real_malloc(size);
+		LOG_MSG(LOG_DEBUG, "Size  %d Addr %p", size, p);
+		return p;
+	}
+};
+
 CServerFrame g_ServerFrame;
 int main(int argc, char **argv)
 {
