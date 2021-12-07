@@ -9,7 +9,7 @@ set(lib_event_home ${lib_dir}/libevent/lib)
 set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_C_COMPILER gcc)
-set(CMAKE_C_COMPILER zapcc)
+#set(CMAKE_C_COMPILER zapcc)
 
 #include_directories(${lib_dir}/base/include)
 include_directories(${lib_dir}/libevent/include)
@@ -21,7 +21,7 @@ set(lib_link_flag "")
 
 
 set(CMAKE_C_FLAGS_DEBUG "-O0 -ggdb -fno-omit-frame-pointer -fstack-protector-all -W -Wextra -Wall -lm -Wno-unused-parameter -Wno-unused-variable -Wno-variable -pipe -D_NEW_LIC -D_GNU_SOURCE -D_REENTRANT -fPIC")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -DFMT_HEADER_ONLY -std=c++0x -rdynamic -ggdb -fno-omit-frame-pointer -fstack-protector-all -W -Wextra -Wall -Wno-literal-suffix -Wno-delete-non-virtual-dtor -lm -Wno-unused-parameter -Wno-conversion-null -Wno-unused-variable -Wno-unused-but-set-variable -Wno-sign-compare -Wno-enum-compare -pipe -D_NEW_LIC -D_GNU_SOURCE -D_REENTRANT -fPIC -Wl,--wrap,malloc") 
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -DFMT_HEADER_ONLY -std=c++0x -rdynamic -ggdb -fno-omit-frame-pointer -fstack-protector-all -W -Wextra -Wall -Wno-literal-suffix -Wno-delete-non-virtual-dtor -lm -Wno-unused-parameter -Wno-conversion-null -Wno-unused-variable -Wno-unused-but-set-variable -Wno-sign-compare -Wno-enum-compare -pipe -D_NEW_LIC -D_GNU_SOURCE -D_REENTRANT -fPIC -Wl,--wrap,malloc -Wl,--wrap,free") 
 set(CMAKE_C_FLAGS_RELEASE "-O2 -ggdb -fno-omit-frame-pointer -fstack-protector-all -W -Wextra -Wall -lm -Wno-unused-parameter -Wno-unused-variable -Wno-variable -pipe -D_NEW_LIC -D_GNU_SOURCE -D_REENTRANT -fPIC")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -std=c++0x -rdynamic -ggdb -fno-omit-frame-pointer -fstack-protector-all -W -Wextra -Wall -lm -Wno-unused-parameter -Wno-unused-variable -Wno-sign-compare -Wno-enum-compare -pipe -D_NEW_LIC -D_GNU_SOURCE -D_REENTRANT -fPIC -DSVNREV=${svn_version}")
 
